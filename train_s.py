@@ -2,7 +2,6 @@ import argparse
 import time
 import os
 import json
-from dataset import RSDataset
 from datasetmu import SentinelDataset
 import sync_transforms
 from torch.utils.data import DataLoader
@@ -26,14 +25,14 @@ def parse_args():
     parser = argparse.ArgumentParser(description="RemoteSensingSegmentation by PyTorch")
     # dataset
     parser.add_argument('--dataset-name', type=str, default='eighteen')
-    parser.add_argument('--data-root', type=str, default="")
+    parser.add_argument('--data-root', type=str, default="/content/munich480")
     parser.add_argument('--train-data-root', type=str, default="tileids/train_fold0.tileids")
     parser.add_argument('--val-data-root', type=str, default="tileids/eval.tileids")
     parser.add_argument('--train-batch-size', type=int, default=32, metavar='N', help='batch size for training (default:16)')
     parser.add_argument('--val-batch-size', type=int, default=32, metavar='N', help='batch size for testing (default:16)')
     # output_save_path
     parser.add_argument('--experiment-start-time', type=str, default=time.strftime('%m-%d-%H:%M:%S', time.localtime(time.time())))
-    parser.add_argument('--save-pseudo-data-path', type=str, default='/root/data/others/yaoganbisai/pseudo_data')
+    parser.add_argument('--save-pseudo-data-path', type=str, default='/content/pseudo_data')
     # augmentation
     parser.add_argument('--base-size', type=int, default=512, help='base image size')
     parser.add_argument('--crop-size', type=int, default=512, help='crop image size')
@@ -112,10 +111,10 @@ class Trainer(object):
     def __init__(self, args):
         self.args = args
         resize_scale_range = [float(scale) for scale in args.resize_scale_range.split(',')]
-        sync_transform = sync_transforms.Compose([
-            sync_transforms.RandomScale(args.base_size, args.crop_size, resize_scale_range),
-            sync_transforms.RandomFlip(args.flip_ratio)
-        ])
+        # sync_transform = sync_transforms.Compose([
+        #     sync_transforms.RandomScale(args.base_size, args.crop_size, resize_scale_range),
+        #     sync_transforms.RandomFlip(args.flip_ratio)
+        # ])
         self.resore_transform = transforms.Compose([
             DeNormalize([.485, .456, .406], [.229, .224, .225]),
             transforms.ToPILImage()
@@ -204,7 +203,7 @@ class Trainer(object):
 
         self.max_iter = args.total_epochs * len(self.train_loader)
         self.save_pseudo_data_path = args.save_pseudo_data_path
-        self.mixup_transform = sync_transforms.Mixup()
+        # self.mixup_transform = sync_transforms.Mixup()
 
 
     def training(self, epoch):

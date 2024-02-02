@@ -10,7 +10,7 @@ from math import cos,pi
 from sklearn.metrics import f1_score, precision_score, recall_score, jaccard_score, accuracy_score, confusion_matrix
 from scipy.ndimage import morphology
 from scipy.ndimage.filters import maximum_filter1d
-import  class_names 
+from class_names import eightTeen_classes
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -24,7 +24,7 @@ class SentinelDataset(torch.utils.data.Dataset):
     '''
 
     def __init__(self, root_dir, seqlength=30,LABEL_FILENAME="y.tif", tileids=None):
-        self.class_names = class_names.eightTeen_classes()
+        self.class_names = eightTeen_classes()
         self.LABEL_FILENAME = LABEL_FILENAME
         self.root_dir = root_dir
         self.name = os.path.basename(root_dir)
