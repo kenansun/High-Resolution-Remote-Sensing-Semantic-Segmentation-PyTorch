@@ -3,6 +3,7 @@ import time
 import os
 import json
 from dataset import RSDataset
+from datasetmu import SentinelDataset
 import sync_transforms
 from torch.utils.data import DataLoader
 import torch.nn as nn
@@ -24,9 +25,10 @@ from tensorboardX import SummaryWriter
 def parse_args():
     parser = argparse.ArgumentParser(description="RemoteSensingSegmentation by PyTorch")
     # dataset
-    parser.add_argument('--dataset-name', type=str, default='five')
-    parser.add_argument('--train-data-root', type=str, default='../data_5_6_21/train')
-    parser.add_argument('--val-data-root', type=str, default='../data_5_6_21/val')
+    parser.add_argument('--dataset-name', type=str, default='eighteen')
+    parser.add_argument('--data-root', type=str, default="")
+    parser.add_argument('--train-data-root', type=str, default="tileids/train_fold0.tileids")
+    parser.add_argument('--val-data-root', type=str, default="tileids/eval.tileids")
     parser.add_argument('--train-batch-size', type=int, default=32, metavar='N', help='batch size for training (default:16)')
     parser.add_argument('--val-batch-size', type=int, default=32, metavar='N', help='batch size for testing (default:16)')
     # output_save_path
@@ -123,21 +125,30 @@ class Trainer(object):
         class_name = args.dataset_name
         if class_name == 'fifteen': from class_names import fifteen_classes
         if class_name == 'five': from class_names import five_classes
-        self.train_dataset = RSDataset(class_name, root=args.train_data_root, mode='train', sync_transforms=sync_transform)
-        self.train_loader = DataLoader(dataset=self.train_dataset,
-                                       batch_size=args.train_batch_size,
-                                       num_workers=args.num_workers,
-                                       shuffle=True,
-                                       drop_last=True)
+        if class_name == 'eighteen' : from class_names import eightTeen_classes
+
+        self.train_dataset = SentinelDataset(args.data_root, tileids=args.train_data_root)
+        self.train_loader = DataLoader(
+            self.train_dataset, batch_size=args.train_batch_size, shuffle=True, num_workers=args.num_workers, drop_last = True)   
+        # self.train_dataset = RSDataset(class_name, root=args.train_data_root, mode='train', sync_transforms=sync_transform)
+        # self.train_loader = DataLoader(dataset=self.train_dataset,
+        #                                batch_size=args.train_batch_size,
+        #                                num_workers=args.num_workers,
+        #                                shuffle=True,
+        #                                drop_last=True)
         print('class names {}.'.format(self.train_dataset.class_names))
         print('Number samples {}.'.format(len(self.train_dataset)))
         if not args.no_val:
-            val_data_set = RSDataset(class_name, root=args.val_data_root, mode='val', sync_transforms=None)
-            self.val_loader = DataLoader(dataset=val_data_set,
-                                         batch_size=args.val_batch_size,
-                                         num_workers=args.num_workers,
-                                         shuffle=False,
-                                         drop_last=True)
+            val_data_set = SentinelDataset(args.data_root, tileids=args.val_data_root)
+            self.val_loader = DataLoader(
+                val_data_set, batch_size=args.val_batch_size, shuffle=True, num_workers=args.num_workers, drop_last = True)
+              
+            # val_data_set = RSDataset(class_name, root=args.val_data_root, mode='val', sync_transforms=None)
+            # self.val_loader = DataLoader(dataset=val_data_set,
+            #                              batch_size=args.val_batch_size,
+            #                              num_workers=args.num_workers,
+            #                              shuffle=False,
+            #                              drop_last=True)
         self.num_classes = len(self.train_dataset.class_names)
         print("类别数：", self.num_classes)
         self.class_loss_weight = torch.Tensor(args.class_loss_weight)

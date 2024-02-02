@@ -1,7 +1,6 @@
 from torch.utils.data import Dataset
 import os
 from PIL import Image
-from class_names import gid_classes
 from torchvision import transforms
 import numpy as np
 import torch
@@ -20,7 +19,7 @@ mask_transform = MaskToTensor()
 class RSDataset(Dataset):
     def __init__(self, root=None, mode=None, img_transform=img_transform, mask_transform=mask_transform, sync_transforms=None):
         # 数据相关
-        self.class_names = gid_classes()
+        # self.class_names = gid_classes()
         self.mode = mode
         self.img_transform = img_transform
         self.mask_transform = mask_transform
@@ -65,8 +64,8 @@ class RSDataset(Dataset):
     def __len__(self):
         return len(self.sync_img_mask)
 
-    def classes(self):
-        return self.class_names
+    # def classes(self):
+    #     return self.class_names
 
 
 if __name__ ==  "__main__":

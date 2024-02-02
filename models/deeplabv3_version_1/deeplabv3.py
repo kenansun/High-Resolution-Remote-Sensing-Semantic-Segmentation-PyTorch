@@ -3,12 +3,13 @@ import torch.nn.functional as F
 from models.deeplabv3_version_1.resnet import ResNet50
 from models.deeplabv3_version_1.aspp import ASPP_Bottleneck
 import torch
+import  class_names 
 
 class DeepLabV3(nn.Module):
-    def __init__(self, num_classes=16):
+    def __init__(self, num_classes=16,input_channel=13):
         super(DeepLabV3, self).__init__()
         self.num_classes = num_classes
-        self.resnet = ResNet50()
+        self.resnet = ResNet50(input_channel=13)
         self.aspp = ASPP_Bottleneck(num_classes=self.num_classes)
 
     def forward(self, x):

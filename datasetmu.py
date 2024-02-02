@@ -10,8 +10,7 @@ from math import cos,pi
 from sklearn.metrics import f1_score, precision_score, recall_score, jaccard_score, accuracy_score, confusion_matrix
 from scipy.ndimage import morphology
 from scipy.ndimage.filters import maximum_filter1d
-
-
+import  class_names 
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -25,6 +24,7 @@ class SentinelDataset(torch.utils.data.Dataset):
     '''
 
     def __init__(self, root_dir, seqlength=30,LABEL_FILENAME="y.tif", tileids=None):
+        self.class_names = class_names.eightTeen_classes()
         self.LABEL_FILENAME = LABEL_FILENAME
         self.root_dir = root_dir
         self.name = os.path.basename(root_dir)
@@ -48,7 +48,7 @@ class SentinelDataset(torch.utils.data.Dataset):
         # statistics
         self.samples = list()
 
-        self.ndates = list()
+        # self.ndates = list()
 
         dirs = []
         if tileids is None:
@@ -83,7 +83,7 @@ class SentinelDataset(torch.utils.data.Dataset):
 
             stats["total_samples"] += 1
             self.samples.append(path)
-            self.ndates.append(ndates)
+            # self.ndates.append(ndates)
 
         print_stats(stats)
 
@@ -108,7 +108,9 @@ class SentinelDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.samples)
-
+    def classes(self):
+        return self.class_names
+        
     def __getitem__(self, idx):
 
         # path = os.path.join(self.data_dir, self.samples[idx])
@@ -146,7 +148,9 @@ class SentinelDataset(torch.utils.data.Dataset):
                     x60 = read(os.path.join(path, date + "_60m.tif"))[0]
                 else:
                     x10 = read(os.path.join(path, date + ".tif"))[0]
-
+                if x10 is not None:
+                    break
+        
         x10 = np.array(x10) * 1e-4
         if self.munich_format:
             x20 = np.array(x20) * 1e-4

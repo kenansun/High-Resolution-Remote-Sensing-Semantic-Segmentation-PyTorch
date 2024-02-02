@@ -89,14 +89,15 @@ class Bottleneck(nn.Module):
         return out
 
 class ResNet50(nn.Module):
-    def __init__(self):
+    def __init__(self,input_channel=13):
         super(ResNet50, self).__init__()
 
         resnet = models.resnet50()
-        resnet.load_state_dict((torch.load("..\...\pretrain\resnet50-19c8e357.pth")))
+        resnet.load_state_dict((torch.load("/content/High-Resolution-Remote-Sensing-Semantic-Segmentation-PyTorch/pretrain/resnet50-19c8e357.pth")))
         self.resnet = nn.Sequential(*list(resnet.children())[:-3])
         self.layer5 = make_layer(Bottleneck, in_channels=4*256, channels=512, num_blocks=3, stride=1, dilation=2)
-
+        resnet.conv1= nn.Conv2d(input_channel, 64, kernel_size=7, stride=2, padding=3,bias=False)
+        nn.init.kaiming_normal_(resnet.conv1.weight, mode='fan_out', nonlinearity='relu')
     def forward(self, x):
         c4 = self.resnet(x)
         output = self.layer5(c4)
