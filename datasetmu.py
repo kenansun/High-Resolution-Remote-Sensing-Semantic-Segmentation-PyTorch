@@ -135,27 +135,15 @@ class SentinelDataset(torch.utils.data.Dataset):
         b4_index = None
         for date in dates:
             if(int(date[4:6]) >= 6):
-                if munich_format is None:
-                    munich_format = os.path.exists(os.path.join(path, date + "_10m.tif"))
-                    if munich_format:  # munich dataset
-                        b8_index = 3
-                        b4_index = 2
-                    else:  # IREA dataset
-                        b8_index = 6
-                        b4_index = 2
-                if munich_format:
-                    x10 = read(os.path.join(path, date + "_10m.tif"))[0]
-                    x20 = read(os.path.join(path, date + "_20m.tif"))[0]
-                    x60 = read(os.path.join(path, date + "_60m.tif"))[0]
-                else:
-                    x10 = read(os.path.join(path, date + ".tif"))[0]
+                x10 = read(os.path.join(path, date + "_10m.tif"))[0]
+                x20 = read(os.path.join(path, date + "_20m.tif"))[0]
+                x60 = read(os.path.join(path, date + "_60m.tif"))[0]
                 if x10 is not None and x20 is not None and x60 is not None:
                     break
         
         x10 = np.array(x10) * 1e-4
-        if self.munich_format:
-            x20 = np.array(x20) * 1e-4
-            x60 = np.array(x60) * 1e-4
+        x20 = np.array(x20) * 1e-4
+        x60 = np.array(x60) * 1e-4
 
         # augmentation
         # if np.random.rand() < self.augmentrate:
@@ -186,18 +174,15 @@ class SentinelDataset(torch.utils.data.Dataset):
 
         label = torch.from_numpy(label)
         x10 = torch.from_numpy(x10)
-        if self.munich_format:
-            x20 = torch.from_numpy(x20)
-            x60 = torch.from_numpy(x60)
-            x20 = torch.unsqueeze(x20, 0)
-            x60 = torch.unsqueeze(x60, 0)
-            x20 = F.interpolate(x20, size=x10.shape[1:3])
-            x60 = F.interpolate(x60, size=x10.shape[1:3])
-            x20 = torch.squeeze(x20, 0)
-            x60 = torch.squeeze(x60, 0)
-            x = torch.cat((x10, x20, x60), 0)
-        else:
-            x = x10
+        x20 = torch.from_numpy(x20)
+        x60 = torch.from_numpy(x60)
+        x20 = torch.unsqueeze(x20, 0)
+        x60 = torch.unsqueeze(x60, 0)
+        x20 = F.interpolate(x20, size=x10.shape[1:3])
+        x60 = F.interpolate(x60, size=x10.shape[1:3])
+        x20 = torch.squeeze(x20, 0)
+        x60 = torch.squeeze(x60, 0)
+        x = torch.cat((x10, x20, x60), 0)
 
         # permute channels with time_series (t x c x h x w) -> (c x t x h x w)
         # x = x.permute(1, 0, 2, 3)
