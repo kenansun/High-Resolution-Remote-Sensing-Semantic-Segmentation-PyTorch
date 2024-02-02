@@ -3,7 +3,6 @@ import torch.nn.functional as F
 from models.deeplabv3_version_1.resnet import ResNet50
 from models.deeplabv3_version_1.aspp import ASPP_Bottleneck
 import torch
-import  class_names 
 
 class DeepLabV3(nn.Module):
     def __init__(self, num_classes=16,input_channel=13):

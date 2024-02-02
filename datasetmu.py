@@ -6,6 +6,7 @@ import torch
 import numpy as np
 import random
 import re
+import torch.nn.functional as F
 from math import cos,pi
 from sklearn.metrics import f1_score, precision_score, recall_score, jaccard_score, accuracy_score, confusion_matrix
 from scipy.ndimage import morphology
@@ -124,7 +125,7 @@ class SentinelDataset(torch.utils.data.Dataset):
         profile["name"] = self.samples[idx]
 
         # unique dates sorted ascending
-        dates = get_dates(path, n=self.seqlength)
+        dates = get_dates(path)
 
         x10 = None
         x20 = None
@@ -148,7 +149,7 @@ class SentinelDataset(torch.utils.data.Dataset):
                     x60 = read(os.path.join(path, date + "_60m.tif"))[0]
                 else:
                     x10 = read(os.path.join(path, date + ".tif"))[0]
-                if x10 is not None:
+                if x10 is not None and x20 is not None and x60 is not None:
                     break
         
         x10 = np.array(x10) * 1e-4
@@ -281,8 +282,8 @@ def get_dates(path, n=None):
 
     dates = set(dates)
 
-    if n is not None:
-        dates = random.sample(dates, n)
+    # if n is not None:
+    #     dates = random.sample(dates, n)
 
     dates = list(dates)
     dates.sort()
