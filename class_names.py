@@ -24,3 +24,23 @@ def five_classes():
                 '森林',
                 '草地',
                 '水体']
+
+def eightTeen_classes():
+        return ['unknown',
+                'sugar beet',
+                'summer oat',
+                'meadow',
+                'rape',
+                'hop',
+                'winter spelt',
+                'winter triticale',
+                'beans',
+                'peas',
+                'potatoe',
+                'winter wheat',
+                'soybeans',
+                'asparagus',
+                'winter barley',
+                'winter rye',
+                'summer barley',
+                'maize']

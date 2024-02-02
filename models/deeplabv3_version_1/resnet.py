@@ -93,7 +93,7 @@ class ResNet50(nn.Module):
         super(ResNet50, self).__init__()
 
         resnet = models.resnet50()
-        resnet.load_state_dict((torch.load("/root/data/others/yaoganbisai/code_6_7/models/pretrained_model/resnet50-19c8e357.pth")))
+        resnet.load_state_dict((torch.load("..\...\pretrain\resnet50-19c8e357.pth")))
         self.resnet = nn.Sequential(*list(resnet.children())[:-3])
         self.layer5 = make_layer(Bottleneck, in_channels=4*256, channels=512, num_blocks=3, stride=1, dilation=2)
 
