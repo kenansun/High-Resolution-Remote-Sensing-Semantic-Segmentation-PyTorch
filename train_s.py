@@ -28,8 +28,8 @@ def parse_args():
     parser.add_argument('--data-root', type=str, default="/content/munich480")
     parser.add_argument('--train-data-root', type=str, default="tileids/train_fold0.tileids")
     parser.add_argument('--val-data-root', type=str, default="tileids/eval.tileids")
-    parser.add_argument('--train-batch-size', type=int, default=32, metavar='N', help='batch size for training (default:16)')
-    parser.add_argument('--val-batch-size', type=int, default=32, metavar='N', help='batch size for testing (default:16)')
+    parser.add_argument('--train-batch-size', type=int, default=512, metavar='N', help='batch size for training (default:16)')
+    parser.add_argument('--val-batch-size', type=int, default=512, metavar='N', help='batch size for testing (default:16)')
     # output_save_path
     parser.add_argument('--experiment-start-time', type=str, default=time.strftime('%m-%d-%H:%M:%S', time.localtime(time.time())))
     parser.add_argument('--save-pseudo-data-path', type=str, default='/content/pseudo_data')
@@ -76,7 +76,7 @@ def parse_args():
 
     parser.add_argument('--best-kappa', type=float, default=0)
 
-    parser.add_argument('--total-epochs', type=int, default=12, metavar='N', help='number of epochs to train (default: 120)')
+    parser.add_argument('--total-epochs', type=int, default=200, metavar='N', help='number of epochs to train (default: 120)')
     parser.add_argument('--start-epoch', type=int, default=0, metavar='N', help='start epoch (default:0)')
 
     parser.add_argument('--resume-path', type=str, default=None)
@@ -164,7 +164,7 @@ class Trainer(object):
             model = model1(num_classes=self.num_classes)# dilate_rate=[6,12,18]
             # resume
             if args.resume_path:
-                state_dict = torch.load('/root/data/others/yaoganbisai/code_6_7/work_dirs/rssrai2019_semantic_segmentation/deeplabv3_version_1/resnet50/06-11-17:37:52/epoch_0_acc_0.42195_kappa_0.69184.pth')
+                state_dict = torch.load(args.resume_path)
                 new_state_dict = OrderedDict()
                 for k, v in state_dict.items():
                     name = k[7:]
@@ -204,6 +204,9 @@ class Trainer(object):
         self.max_iter = args.total_epochs * len(self.train_loader)
         self.save_pseudo_data_path = args.save_pseudo_data_path
         # self.mixup_transform = sync_transforms.Mixup()
+
+
+
 
 
     def training(self, epoch):
